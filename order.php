@@ -50,27 +50,22 @@ $conn->close();
             document.getElementById("greeting").innerHTML = greeting + ", " + cashierName;
         }
     </script>
-<style>
-    .svg-inline--fa {
-        display: none;
-    }
-    .fa-bars-staggered{
-        display: block;
-        color:#fff;
-        font-size: 20px;
-    }
-</style>
+
 </head>
 
 <body onload="greetUser()">
     <?php include 'sidebar.php'; ?>
     <div class="page_all">
         <div class="welcome_base">
-            <div class="greetings">
-                <h1 id="greeting"> <?php echo $cashierName; ?></h1>
-                <!-- <p>Welcome to Olu's Kitchen, </p> -->
+            <div class="profile">
+               
             </div>
-            <div class="profile"></div>
+            <div class="greetings">
+                <h1 id="greeting"><?php echo $cashierName; ?></h1>
+            </div>
+             <button id="darkModeToggle">
+                    <i id="darkModeIcon" class="fas fa-moon"></i>
+                </button>
         </div>
         <div class="page_cards">
             <!-- Add search input field -->
@@ -164,11 +159,10 @@ $conn->close();
             </div>
         </div>
     </div>
-
+    <script src="./js/toggle.js"></script>
     <script src="./js/swiper.js"></script>
     <script src="./js/order.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
     <script>
         flatpickr("#order-date", {
             dateFormat: "Y-m-d",
@@ -210,8 +204,11 @@ $conn->close();
                 // Show or hide the "No results found" message
                 noResultsMessage.style.display = hasResults ? 'none' : 'block';
             });
+
+           
         });
     </script>
 </body>
+
 
 </html>

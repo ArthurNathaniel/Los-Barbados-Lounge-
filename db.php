@@ -2,14 +2,14 @@
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "leepos";
+$dbname = "barbados";
 
 
 
 // $servername = "nathstack.tech";
-// $username = "u500921674_leepos";
+// $username = "u500921674_barbados";
 // $password = "OnGod@123";
-// $dbname = "u500921674_leepos";
+// $dbname = "u500921674_barbados";
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);

@@ -7,12 +7,33 @@
     text-decoration: none;
     font-family: "Onest", sans-serif;
 }
-
 body {
-    font-family: "Onest", sans-serif;
-    background-color: #f2f4f7;
-    overflow-y: scroll;
+    transition: background-color 0.3s, color 0.3s;
 }
+
+body.light-mode {
+    background-color: #f2f6f9;
+    color: rgba(0, 0, 0, 0.77);
+}
+
+body.dark-mode {
+    background-color: #121212;
+    color: white;
+}
+
+body.dark-mode .greetings{
+    color: #121212;
+}
+
+#darkModeToggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5em;
+    color: #000;
+
+}
+
 
 h1,
 h2,
@@ -138,6 +159,7 @@ h6 {
     padding: 0 2%;
     padding-block: 10px;
     border-radius: 30px;
+    border: 1px dashed #E4002B;
 }
 
 .profile {

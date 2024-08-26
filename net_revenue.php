@@ -8,28 +8,43 @@ if (!isset($_SESSION['username'])) {
 
 include 'db.php';
 
-// Default to today's date
 $selectedDate = date('Y-m-d');
+$totalEarnings = 0;
+$totalExpenses = 0;
 
-// If form is submitted, update the selected date
+// If form is submitted, update the selected date and fetch data
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $selectedDate = $_POST['date'];
+
+    // Fetch total revenue (earnings) for the selected date
+    $paymentQuery = "SELECT SUM(price * quantity) as total_amount 
+                     FROM orders 
+                     WHERE DATE(date) = ?";
+    $stmt = $conn->prepare($paymentQuery);
+    $stmt->bind_param("s", $selectedDate);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $totalEarnings = $row['total_amount'] ?? 0;
+    }
+    $stmt->close();
+
+    // Fetch total expenses for the selected date
+    $sqlExpenses = "SELECT SUM(amount) as total_expenses FROM expenses WHERE date = ?";
+    $stmtExpenses = $conn->prepare($sqlExpenses);
+    $stmtExpenses->bind_param("s", $selectedDate);
+    $stmtExpenses->execute();
+    $resultExpenses = $stmtExpenses->get_result();
+    $totalExpenses = ($resultExpenses->num_rows > 0) ? $resultExpenses->fetch_assoc()['total_expenses'] : 0;
+    $stmtExpenses->close();
 }
-
-// Fetch total revenue for the selected date
-$sqlRevenue = "SELECT SUM(total) as total_revenue FROM orders WHERE date = '$selectedDate'";
-$resultRevenue = $conn->query($sqlRevenue);
-$totalRevenue = ($resultRevenue->num_rows > 0) ? $resultRevenue->fetch_assoc()['total_revenue'] : 0;
-
-// Fetch total expenses for the selected date
-$sqlExpenses = "SELECT SUM(amount) as total_expenses FROM expenses WHERE date = '$selectedDate'";
-$resultExpenses = $conn->query($sqlExpenses);
-$totalExpenses = ($resultExpenses->num_rows > 0) ? $resultExpenses->fetch_assoc()['total_expenses'] : 0;
 
 $conn->close();
 
 // Calculate net revenue
-$netRevenue = $totalRevenue - $totalExpenses;
+$netRevenue = $totalEarnings - $totalExpenses;
 ?>
 
 <!DOCTYPE html>
@@ -42,7 +57,7 @@ $netRevenue = $totalRevenue - $totalExpenses;
     <link rel="stylesheet" href="./css/base.css">
     <link rel="stylesheet" href="./css/food.css">
     <link rel="stylesheet" href="./css/expenses.css">
-<script>
+    <script>
         function greetUser() {
             var currentTime = new Date();
             var currentHour = currentTime.getHours();
@@ -68,21 +83,24 @@ $netRevenue = $totalRevenue - $totalExpenses;
         <div class="welcome_base">
             <div class="greetings">
                 <h1 id="greeting"></h1>
-                <!-- <p>Welcome to Olu's Kitchen, </p> -->
             </div>
             <div class="profile"></div>
         </div>
+
         <h2>Net Revenue</h2>
-        <form method="POST" action="net_revenue.php">
+        <form method="POST" action="">
             <div class="forms">
                 <label for="date">Date</label>
-                <input type="date" id="date" name="date" value="<?php echo $selectedDate; ?>" required>
+                <input type="date" id="date" name="date" value="<?php echo htmlspecialchars($selectedDate); ?>" required>
             </div>
             <div class="forms">
                 <button type="submit">Query</button>
             </div>
         </form>
-        <h3>Year: <?php echo $selectedDate; ?></h3>
+
+        <h3>Date: <?php echo htmlspecialchars($selectedDate); ?></h3>
+
+        <h2>Net Revenue</h2>
         <table>
             <thead>
                 <tr>
@@ -94,8 +112,8 @@ $netRevenue = $totalRevenue - $totalExpenses;
             </thead>
             <tbody>
                 <tr>
-                    <td><?php echo $selectedDate; ?></td>
-                    <td>GH₵ <?php echo number_format($totalRevenue, 2); ?></td>
+                    <td><?php echo htmlspecialchars($selectedDate); ?></td>
+                    <td>GH₵ <?php echo number_format($totalEarnings, 2); ?></td>
                     <td>GH₵ <?php echo number_format($totalExpenses, 2); ?></td>
                     <td>GH₵ <?php echo number_format($netRevenue, 2); ?></td>
                 </tr>

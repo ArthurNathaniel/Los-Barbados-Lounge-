@@ -63,12 +63,16 @@ $conn->close();
 <body onload="greetUser()">
     <?php include 'sidebar.php'; ?>
     <div class="history_all">
-        <div class="welcome_base">
-            <div class="greetings">
-                <h1 id="greeting"> <?php echo $cashierName; ?></h1>
-                <!-- <p>Welcome to Olu's Kitchen, </p> -->
+    <div class="welcome_base">
+            <div class="profile">
+               
             </div>
-            <div class="profile"></div>
+            <div class="greetings">
+                <h1 id="greeting"><?php echo $cashierName; ?></h1>
+            </div>
+             <button id="darkModeToggle">
+                    <i id="darkModeIcon" class="fas fa-moon"></i>
+                </button>
         </div>
         <h1>Orders</h1>
         <?php if (empty($groupedOrders)) : ?>
@@ -123,6 +127,7 @@ $conn->close();
             </table>
         <?php endif; ?>
     </div>
+    <script src="./js/toggle.js"></script>
 </body>
 
 </html>

@@ -27,19 +27,23 @@ $revenueData = array_fill(0, 12, 0);
 $expenseData = array_fill(0, 12, 0);
 $netRevenueData = array_fill(0, 12, 0);
 
-// Fetch total revenue and expenses for each month of the selected year
+// Fetch total revenue, expenses, and calculate net revenue for each month of the selected year
 for ($month = 1; $month <= 12; $month++) {
     $startDate = "$selectedYear-$month-01";
     $endDate = date("Y-m-t", strtotime($startDate)); // Get last day of the month
 
     // Fetch total revenue for the month
-    $sqlRevenue = "SELECT SUM(total) as total_revenue FROM orders WHERE date BETWEEN '$startDate' AND '$endDate'";
+    $sqlRevenue = "SELECT SUM(price * quantity) as total_amount 
+                   FROM orders 
+                   WHERE DATE(date) BETWEEN '$startDate' AND '$endDate'";
     $resultRevenue = $conn->query($sqlRevenue);
-    $totalRevenue = ($resultRevenue->num_rows > 0) ? $resultRevenue->fetch_assoc()['total_revenue'] : 0;
+    $totalRevenue = ($resultRevenue->num_rows > 0) ? $resultRevenue->fetch_assoc()['total_amount'] : 0;
     $revenueData[$month - 1] = $totalRevenue;
 
     // Fetch total expenses for the month
-    $sqlExpenses = "SELECT SUM(amount) as total_expenses FROM expenses WHERE date BETWEEN '$startDate' AND '$endDate'";
+    $sqlExpenses = "SELECT SUM(amount) as total_expenses 
+                    FROM expenses 
+                    WHERE DATE(date) BETWEEN '$startDate' AND '$endDate'";
     $resultExpenses = $conn->query($sqlExpenses);
     $totalExpenses = ($resultExpenses->num_rows > 0) ? $resultExpenses->fetch_assoc()['total_expenses'] : 0;
     $expenseData[$month - 1] = $totalExpenses;
@@ -87,12 +91,11 @@ $conn->close();
         <div class="welcome_base">
             <div class="greetings">
                 <h1 id="greeting"></h1>
-                <!-- <p>Welcome to Olu's Kitchen, </p> -->
             </div>
             <div class="profile"></div>
         </div>
         <h2>Net Revenue by Month</h2>
-        <form method="POST" action="net_revenue_monthly.php">
+        <form method="POST" action="">
             <div class="forms">
                 <label for="year">Year</label>
                 <select id="year" name="year" required>
@@ -122,9 +125,9 @@ $conn->close();
                 <?php foreach ($months as $index => $month) : ?>
                     <tr>
                         <td><?php echo $month; ?></td>
-                        <td>$<?php echo number_format($revenueData[$index], 2); ?></td>
-                        <td>$<?php echo number_format($expenseData[$index], 2); ?></td>
-                        <td>$<?php echo number_format($netRevenueData[$index], 2); ?></td>
+                        <td>GH₵ <?php echo number_format($revenueData[$index], 2); ?></td>
+                        <td>GH₵ <?php echo number_format($expenseData[$index], 2); ?></td>
+                        <td>GH₵ <?php echo number_format($netRevenueData[$index], 2); ?></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>

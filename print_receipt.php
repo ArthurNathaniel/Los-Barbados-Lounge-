@@ -58,6 +58,7 @@ $conn->close();
     <link rel="stylesheet" href="./css/base.css">
     <link rel="stylesheet" href="./css/food.css">
     <style>
+       
         .receipt {
             width: 600px;
             margin: 0 auto;
@@ -96,9 +97,9 @@ $conn->close();
             padding-top: 10px;
         }
 
-        th {
+        /* th {
             background-color: #000;
-        }
+        } */
 
         table {
             margin-top: 20px;
@@ -108,10 +109,11 @@ $conn->close();
 
 <body>
     <div class="receipt">
+        <div class="logo"></div>
         <div class="logo_details">
-            <h2>LeePOS System</h2>
-            <p><strong>Address:</strong> Asawase B- Line Near On The Run</p>
-            <p><strong>Contact:</strong> +233 541 987 478</p>
+            <h2>Los Barbados Lounge</h2>
+            <p><strong>Location:</strong> KNUST Mango Road </p>
+            <p><strong>Contact:</strong>  +233 57 615 7127</p>
 
         </div>
         <div class="dash">
@@ -165,7 +167,7 @@ $conn->close();
 
 
         <div class="dash">
-            <h2>Order ID: <?php echo $order['id']; ?></h2>
+            <h2>Order ID: <?php echo $order['order_id']; ?></h2>
         </div>
         <p class="powered">Powered by Nathstack Tech | Tel: +233 541 9874 78</p>
     </div>

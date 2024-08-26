@@ -18,26 +18,44 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $selectedYear = $_POST['year'];
 }
 
-// Initialize variables for total revenue, total expenses, and net revenue
-$totalRevenue = 0;
-$totalExpenses = 0;
+// Initialize arrays to store data
+$months = [
+    'January', 'February', 'March', 'April', 'May', 'June', 
+    'July', 'August', 'September', 'October', 'November', 'December'
+];
+$revenueData = array_fill(0, 12, 0);
+$expenseData = array_fill(0, 12, 0);
+$netRevenueData = array_fill(0, 12, 0);
 
-// Fetch total revenue for the selected year
-$sqlRevenue = "SELECT SUM(total) as total_revenue FROM orders WHERE YEAR(date) = $selectedYear";
-$resultRevenue = $conn->query($sqlRevenue);
-if ($resultRevenue->num_rows > 0) {
-    $totalRevenue = $resultRevenue->fetch_assoc()['total_revenue'];
+// Fetch total revenue and expenses for each month of the selected year
+for ($month = 1; $month <= 12; $month++) {
+    $startDate = "$selectedYear-$month-01";
+    $endDate = date("Y-m-t", strtotime($startDate)); // Get last day of the month
+
+    // Fetch total revenue for the month
+    $sqlRevenue = "SELECT SUM(price * quantity) as total_amount 
+                   FROM orders 
+                   WHERE DATE(date) BETWEEN '$startDate' AND '$endDate'";
+    $resultRevenue = $conn->query($sqlRevenue);
+    $totalRevenue = ($resultRevenue->num_rows > 0) ? $resultRevenue->fetch_assoc()['total_amount'] : 0;
+    $revenueData[$month - 1] = $totalRevenue;
+
+    // Fetch total expenses for the month
+    $sqlExpenses = "SELECT SUM(amount) as total_expenses 
+                    FROM expenses 
+                    WHERE DATE(date) BETWEEN '$startDate' AND '$endDate'";
+    $resultExpenses = $conn->query($sqlExpenses);
+    $totalExpenses = ($resultExpenses->num_rows > 0) ? $resultExpenses->fetch_assoc()['total_expenses'] : 0;
+    $expenseData[$month - 1] = $totalExpenses;
+
+    // Calculate net revenue for the month
+    $netRevenueData[$month - 1] = $totalRevenue - $totalExpenses;
 }
 
-// Fetch total expenses for the selected year
-$sqlExpenses = "SELECT SUM(amount) as total_expenses FROM expenses WHERE YEAR(date) = $selectedYear";
-$resultExpenses = $conn->query($sqlExpenses);
-if ($resultExpenses->num_rows > 0) {
-    $totalExpenses = $resultExpenses->fetch_assoc()['total_expenses'];
-}
-
-// Calculate net revenue
-$netRevenue = $totalRevenue - $totalExpenses;
+// Calculate total revenue, total expenses, and net revenue for the entire year
+$totalYearlyRevenue = array_sum($revenueData);
+$totalYearlyExpenses = array_sum($expenseData);
+$totalYearlyNetRevenue = $totalYearlyRevenue - $totalYearlyExpenses;
 
 $conn->close();
 ?>
@@ -78,12 +96,11 @@ $conn->close();
         <div class="welcome_base">
             <div class="greetings">
                 <h1 id="greeting"></h1>
-                <!-- <p>Welcome to Olu's Kitchen, </p> -->
             </div>
             <div class="profile"></div>
         </div>
         <h2>Yearly Net Revenue</h2>
-        <form method="POST" action="yearly_net_revenue.php">
+        <form method="POST" action="">
             <div class="forms">
                 <label for="year">Year</label>
                 <select id="year" name="year" required>
@@ -104,11 +121,20 @@ $conn->close();
         // Display the yearly net revenue in a table format
         echo "<h3>Year: $selectedYear</h3>";
         echo "<table>";
-        echo "<tr><th>Total Revenue</th><th>Total Expenses</th><th>Net Revenue</th></tr>";
+        echo "<tr><th>Month</th><th>Total Revenue</th><th>Total Expenses</th><th>Net Revenue</th></tr>";
+        foreach ($months as $index => $month) {
+            echo "<tr>";
+            echo "<td>$month</td>";
+            echo "<td>GH₵ " . number_format($revenueData[$index], 2) . "</td>";
+            echo "<td>GH₵ " . number_format($expenseData[$index], 2) . "</td>";
+            echo "<td>GH₵ " . number_format($netRevenueData[$index], 2) . "</td>";
+            echo "</tr>";
+        }
         echo "<tr>";
-        echo "<td>GH₵ " . number_format($totalRevenue, 2) . "</td>";
-        echo "<td>GH₵ " . number_format($totalExpenses, 2) . "</td>";
-        echo "<td>GH₵ " . number_format($netRevenue, 2) . "</td>";
+        echo "<td><strong>Total</strong></td>";
+        echo "<td><strong>GH₵ " . number_format($totalYearlyRevenue, 2) . "</strong></td>";
+        echo "<td><strong>GH₵ " . number_format($totalYearlyExpenses, 2) . "</strong></td>";
+        echo "<td><strong>GH₵ " . number_format($totalYearlyNetRevenue, 2) . "</strong></td>";
         echo "</tr>";
         echo "</table>";
         ?>

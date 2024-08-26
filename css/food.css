@@ -14,10 +14,12 @@
 .profile{
     height: 80px;
     width: 80px;
-    border: 2px solid;
+    border: 2px dashed #E4002B;
     border-radius: 50%;
-    background-image: url(../images/profile.png);
+    background-image: url(../images/logo.png);
     background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 .cards_container {
     display: grid;
@@ -33,7 +35,7 @@
 
 .card img {
     width: 100%;
-    height: 200px;
+    height: 250px;
     border-radius: 15px;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
     object-fit: cover;
